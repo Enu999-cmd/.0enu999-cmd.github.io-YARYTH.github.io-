@@ -5,26 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Para mi novia</title>
     <style>
-      /* ——— Reset ——— */
+      /* ——— Reset ——— */
       *, *::before, *::after {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
 
-      /* ——— Base ——— */
+      /* ——— Fondo animado ——— */
       body {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background: #ffe6e6; /* Rosa suave */
         font-family: "Segoe UI", system-ui, sans-serif;
         text-align: center;
-        overflow: hidden; /* Oculta burbujas que salgan de vista */
-        padding: 1rem;
-        cursor: pointer; /* Clic en cualquier lado */
+        overflow: hidden;
+        cursor: pointer; /* clic en cualquier lado */
+        position: relative;
+      }
+
+      /* Suave animación de degradado */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(45deg, #ffe6e6, #fff1f1, #ffe6e6);
+        background-size: 400% 400%;
+        animation: bgmove 15s ease infinite;
+        z-index: -2;
+      }
+
+      @keyframes bgmove {
+        0%, 100% { background-position: 0 0; }
+        50%      { background-position: 100% 100%; }
       }
 
       h1 {
@@ -32,10 +47,10 @@
         margin-bottom: 2rem;
         color: #cc0000;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.15);
-        pointer-events: none; /* Sigue dejando clics pasar */
+        pointer-events: none;
       }
 
-      /* ——— Corazón ——— */
+      /* ——— Corazón central ——— */
       #heart {
         position: relative;
         width: 120px;
@@ -57,24 +72,15 @@
         border-radius: 50%;
       }
 
-      #heart::before {
-        top: -60px;
-        left: 0;
-      }
+      #heart::before { top: -60px; left: 0; }
+      #heart::after  { top: 0;    left: 60px; }
 
-      #heart::after {
-        left: 60px;
-        top: 0;
-      }
-
-      /* Efecto latido extra al hacer click */
-      #heart.clicked {
-        animation: beat-click 0.6s ease forwards;
-      }
+      /* Latido extra en clic */
+      #heart.clicked { animation: beat-click 0.6s ease forwards; }
 
       @keyframes beat {
         0%, 100% { transform: rotate(-45deg) scale(1); }
-        50% { transform: rotate(-45deg) scale(1.08); }
+        50%      { transform: rotate(-45deg) scale(1.08); }
       }
 
       @keyframes beat-click {
@@ -84,7 +90,7 @@
         100% { transform: rotate(-45deg) scale(1);    }
       }
 
-      /* ——— Mensaje largo ——— */
+      /* ——— Mensaje largo ——— */
       #message {
         max-width: 650px;
         margin-top: 2rem;
@@ -103,9 +109,9 @@
         to   { opacity: 1; transform: translateY(0);    }
       }
 
-      /* ——— Burbujas "Te amo" ——— */
+      /* ——— Burbujas "Te amo" en clic ——— */
       .teamo {
-        position: absolute;
+        position: fixed;
         font-size: 1.25rem;
         color: #e60023;
         font-weight: bold;
@@ -113,12 +119,45 @@
         user-select: none;
         pointer-events: none;
         animation: bubble 1.2s forwards;
+        z-index: 10;
       }
 
       @keyframes bubble {
         0%   { opacity: 1; transform: translate(-50%, 0) scale(0.8); }
         80%  { opacity: 0.8; }
         100% { opacity: 0; transform: translate(-50%, -80px) scale(1.4); }
+      }
+
+      /* ——— Corazones flotantes continuos ——— */
+      .float-heart {
+        position: fixed;
+        bottom: -40px;
+        width: var(--size);
+        height: var(--size);
+        background: #ff4d6d;
+        transform: rotate(-45deg);
+        pointer-events: none;
+        z-index: -1;
+        animation: rise var(--duration) linear forwards;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+      }
+
+      .float-heart::before,
+      .float-heart::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #ff4d6d;
+        border-radius: 50%;
+      }
+
+      .float-heart::before { top: -50%; left: 0; }
+      .float-heart::after  { top: 0;    left: 50%; }
+
+      @keyframes rise {
+        0%   { opacity: 0.9; transform: translateY(0)  rotate(-45deg) scale(1); }
+        100% { opacity: 0;   transform: translateY(-120vh) rotate(-45deg) scale(1.8); }
       }
     </style>
   </head>
@@ -140,28 +179,42 @@
     </div>
 
     <script>
-      const heart = document.getElementById("heart");
+      const heart   = document.getElementById("heart");
       const message = document.getElementById("message");
 
-      // Toggle del mensaje largo al hacer clic en el corazón
+      // Toggle mensaje largo al hacer clic en el corazón
       heart.addEventListener("click", (e) => {
-        e.stopPropagation(); // Evita que dispare la burbuja al mismo tiempo
+        e.stopPropagation();
         heart.classList.add("clicked");
         setTimeout(() => heart.classList.remove("clicked"), 600);
         message.classList.toggle("show");
       });
 
-      // Burbuja "Te amo" en cualquier lugar que se haga clic
+      /* Burbujas de "Te amo" al hacer clic en cualquier parte */
       document.addEventListener("click", (e) => {
         const bubble = document.createElement("span");
         bubble.textContent = "Te amo";
-        bubble.className = "teamo";
-        bubble.style.left = `${e.clientX}px`;
-        bubble.style.top = `${e.clientY}px`;
+        bubble.className   = "teamo";
+        bubble.style.left  = `${e.clientX}px`;
+        bubble.style.top   = `${e.clientY}px`;
         document.body.appendChild(bubble);
-
         setTimeout(() => bubble.remove(), 1400);
       });
+
+      /* Corazones flotantes continuos */
+      function createFloatingHeart() {
+        const heart = document.createElement("div");
+        heart.className = "float-heart";
+        const size = Math.random() * 20 + 10; // 10–30 px
+        const duration = Math.random() * 3 + 4; // 4–7 s
+        heart.style.setProperty("--size", `${size}px`);
+        heart.style.setProperty("--duration", `${duration}s`);
+        heart.style.left = Math.random() * 100 + "vw";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), duration * 1000);
+      }
+      setInterval(createFloatingHeart, 500);
     </script>
   </body>
 </html>
+
