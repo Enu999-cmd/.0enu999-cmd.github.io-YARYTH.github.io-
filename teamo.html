@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Para mi novia</title>
+    <style>
+      /* ——— Reset ——— */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* ——— Base ——— */
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: #ffe6e6; /* Rosa suave */
+        font-family: "Segoe UI", system-ui, sans-serif;
+        text-align: center;
+        overflow: hidden; /* Oculta burbujas que salgan de vista */
+        padding: 1rem;
+        cursor: pointer; /* Clic en cualquier lado */
+      }
+
+      h1 {
+        font-size: 2.4rem;
+        margin-bottom: 2rem;
+        color: #cc0000;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.15);
+        pointer-events: none; /* Sigue dejando clics pasar */
+      }
+
+      /* ——— Corazón ——— */
+      #heart {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        background: #e60023;
+        transform: rotate(-45deg);
+        cursor: pointer;
+        animation: beat 1.4s infinite ease-in-out;
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
+      }
+
+      #heart::before,
+      #heart::after {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        background: #e60023;
+        border-radius: 50%;
+      }
+
+      #heart::before {
+        top: -60px;
+        left: 0;
+      }
+
+      #heart::after {
+        left: 60px;
+        top: 0;
+      }
+
+      /* Efecto latido extra al hacer click */
+      #heart.clicked {
+        animation: beat-click 0.6s ease forwards;
+      }
+
+      @keyframes beat {
+        0%, 100% { transform: rotate(-45deg) scale(1); }
+        50% { transform: rotate(-45deg) scale(1.08); }
+      }
+
+      @keyframes beat-click {
+        0%   { transform: rotate(-45deg) scale(1); }
+        30%  { transform: rotate(-45deg) scale(1.25); }
+        60%  { transform: rotate(-45deg) scale(0.9);  }
+        100% { transform: rotate(-45deg) scale(1);    }
+      }
+
+      /* ——— Mensaje largo ——— */
+      #message {
+        max-width: 650px;
+        margin-top: 2rem;
+        font-size: 1.15rem;
+        line-height: 1.6;
+        color: #333;
+        display: none;
+        animation: fade 0.8s ease forwards;
+        pointer-events: none;
+      }
+
+      #message.show { display: block; }
+
+      @keyframes fade {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0);    }
+      }
+
+      /* ——— Burbujas "Te amo" ——— */
+      .teamo {
+        position: absolute;
+        font-size: 1.25rem;
+        color: #e60023;
+        font-weight: bold;
+        white-space: nowrap;
+        user-select: none;
+        pointer-events: none;
+        animation: bubble 1.2s forwards;
+      }
+
+      @keyframes bubble {
+        0%   { opacity: 1; transform: translate(-50%, 0) scale(0.8); }
+        80%  { opacity: 0.8; }
+        100% { opacity: 0; transform: translate(-50%, -80px) scale(1.4); }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Para mi reina ❤️</h1>
+
+    <div id="heart" title="Haz clic en el corazón"></div>
+
+    <div id="message">
+      <p>
+        Mi reina hermosa, gracias por pasar tanto tiempo conmigo en las buenas y
+        malas. Te amo, y a pesar de que sabes cómo soy, me sigues amando. Ahí
+        supe que debo quedarme; ahí supe que te debo mi mundo y darte el mundo,
+        porque te lo mereces más que nadie. Te has ganado mi respeto, mi interés,
+        mi tiempo, y lo más importante, mi vida propia. Sigamos creciendo como
+        pareja y mejores amigos; sigamos creciendo en muchos ámbitos. Te amo.
+        Nunca olvides el amor que tengo hacia ti.
+      </p>
+    </div>
+
+    <script>
+      const heart = document.getElementById("heart");
+      const message = document.getElementById("message");
+
+      // Toggle del mensaje largo al hacer clic en el corazón
+      heart.addEventListener("click", (e) => {
+        e.stopPropagation(); // Evita que dispare la burbuja al mismo tiempo
+        heart.classList.add("clicked");
+        setTimeout(() => heart.classList.remove("clicked"), 600);
+        message.classList.toggle("show");
+      });
+
+      // Burbuja "Te amo" en cualquier lugar que se haga clic
+      document.addEventListener("click", (e) => {
+        const bubble = document.createElement("span");
+        bubble.textContent = "Te amo";
+        bubble.className = "teamo";
+        bubble.style.left = `${e.clientX}px`;
+        bubble.style.top = `${e.clientY}px`;
+        document.body.appendChild(bubble);
+
+        setTimeout(() => bubble.remove(), 1400);
+      });
+    </script>
+  </body>
+</html>
